@@ -26,7 +26,15 @@ const client = new MongoClient(uri, {
       app.post('/products', async(req, res) => {
          const product = req.body;
          await productCollection.insertOne(product);
+         res.json({ product });
          res.send({ success: true, message: 'Successfully inserted' });
+      })
+
+      app.get('/products', async(req, res) => {
+         const query = {};
+         const cursor = productCollection.find(query);
+         const products = await cursor.toArray();
+         res.send(products);
       })
    } catch (error) {
       console.log(error);
