@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require("cors");
 const app = express();
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -23,18 +23,30 @@ const client = new MongoClient(uri, {
       await client.connect();
       const productCollection = client.db('barakah').collection('products');
       // console.log('DB connected');
+      // post data to DB 
       app.post('/products', async(req, res) => {
          const product = req.body;
          await productCollection.insertOne(product);
-         res.json({ product });
-         res.send({ success: true, message: 'Successfully inserted' });
+         // res.json({ product });
+         res.send({ success: true, message: `Successfully inserted ${product.name}` });
       })
-
+      // get all products 
       app.get('/products', async(req, res) => {
          const query = {};
          const cursor = productCollection.find(query);
          const products = await cursor.toArray();
          res.send(products);
+      })
+      // delete 
+      app.delete('/products/:id', async(req, res) => {
+         const id = req.params.id;
+         const query = { _id: ObjectId(id) };
+         const result = await productCollection.deleteOne(query);
+         // res.send(result);
+         res.send({
+           success: true,
+           message: `Successfully deleted`,
+         });
       })
    } catch (error) {
       console.log(error);
