@@ -5,6 +5,10 @@ require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const port = process.env.PORT || 5000;
 
+// middleware
+app.use(cors());
+app.use(express.json());
+
 // DB connection
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@barakah.z3u4t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
   
@@ -18,14 +22,18 @@ const client = new MongoClient(uri, {
    try {
       await client.connect();
       const productCollection = client.db('barakah').collection('products');
-      console.log('DB connected');
+      // console.log('DB connected');
+      app.post('/products', async(req, res) => {
+         const product = req.body;
+         await productCollection.insertOne(product);
+         res.send({ success: true, message: 'Successfully inserted' });
+      })
    } catch (error) {
       console.log(error);
    }
 })();
 
-// middleware
-app.use(cors());
+
 
 
 
