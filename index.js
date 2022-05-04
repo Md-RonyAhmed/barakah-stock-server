@@ -55,14 +55,9 @@ const client = new MongoClient(uri, {
 
 
 
-
-
-
-
-
 // testing api 
 app.get("/json", (req, res) => {
-   res.send({ message: "Barakah stock running"});
+   res.send({ message: "Barakah stocks running"});
 });
 
 app.listen(port, () => {
