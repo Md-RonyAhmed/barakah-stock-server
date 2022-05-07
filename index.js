@@ -34,7 +34,7 @@ const client = new MongoClient(uri, {
         message: `Successfully inserted ${product.name}`,
       });
     });
-    // get all products
+    // get limit products
     app.get("/products", async (req, res) => {
        const limit = Number(req.query.limit);
        console.log(limit);
@@ -49,6 +49,21 @@ const client = new MongoClient(uri, {
         data: products
       });
     });
+    // get all products
+    app.get("/products", async (req, res) => {
+       const query = {};
+      const cursor = productCollection.find(query);
+       const products = await cursor.toArray();
+      if (!products?.length) {
+        return res.send({ success: false, error: "No product found" });
+      }
+      res.send({
+        success: true,
+        data: products
+      });
+    });
+     
+     
     // delete
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
