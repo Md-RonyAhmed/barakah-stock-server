@@ -42,10 +42,10 @@ const client = new MongoClient(uri, {
     // get limit products
     app.get("/products", async (req, res) => {
       const limit = Number(req.query.limit);
-      console.log(limit);
+      // console.log(limit);
       const cursor = productCollection.find();
       const products = await cursor.limit(limit).toArray();
-      console.log(products);
+      // console.log(products);
       if (!products?.length) {
         return res.send({ success: false, error: "No product found" });
       }
@@ -73,14 +73,14 @@ const client = new MongoClient(uri, {
     app.get("/products", async (req, res) => {
       const limit = Number(req.query.limit);
       const pageNumber = Number(req.query.pageNumber);
-
-      console.log(limit, pageNumber);
+      console.log(pageNumber);
 
       const cursor = productCollection.find();
       const products = await cursor
         .skip(limit * pageNumber)
         .limit(limit)
         .toArray();
+      
 
       const count = await productCollection.estimatedDocumentCount();
 
