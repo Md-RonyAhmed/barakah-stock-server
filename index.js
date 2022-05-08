@@ -63,6 +63,18 @@ const client = new MongoClient(uri, {
       });
     });
      
+     //get with id
+      app.get("/products/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+         const cursor = productCollection.find(query);
+         const products = await cursor.toArray();
+        // res.send(result);
+        res.send({
+          success: true,
+          data: products,
+        });
+      });
      
     // delete
     app.delete("/products/:id", async (req, res) => {
