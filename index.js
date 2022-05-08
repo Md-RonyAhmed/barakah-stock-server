@@ -9,10 +9,10 @@ const port = process.env.PORT || 5000;
 // middleware
 const corsConfig = {
   origin: true,
-  credentials:true
-}
+  credentials: true,
+};
 app.use(cors(corsConfig));
-app.options('*', cors(corsConfig));
+app.options("*", cors(corsConfig));
 app.use(express.json());
 
 // DB connection
@@ -41,46 +41,69 @@ const client = new MongoClient(uri, {
     });
     // get limit products
     app.get("/products", async (req, res) => {
-       const limit = Number(req.query.limit);
-       console.log(limit);
+      const limit = Number(req.query.limit);
+      console.log(limit);
       const cursor = productCollection.find();
-       const products = await cursor.limit(limit).toArray();
-       console.log(products);
+      const products = await cursor.limit(limit).toArray();
+      console.log(products);
       if (!products?.length) {
         return res.send({ success: false, error: "No product found" });
       }
       res.send({
         success: true,
-        data: products
+        data: products,
       });
     });
     // get all products
     app.get("/products", async (req, res) => {
-       const query = {};
+      const query = {};
       const cursor = productCollection.find(query);
-       const products = await cursor.toArray();
+      const products = await cursor.toArray();
       if (!products?.length) {
         return res.send({ success: false, error: "No product found" });
       }
       res.send({
         success: true,
-        data: products
+        data: products,
       });
     });
-     
-     //get with id
-      app.get("/products/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: ObjectId(id) };
-         const cursor = productCollection.find(query);
-         const products = await cursor.toArray();
-        // res.send(result);
-        res.send({
-          success: true,
-          data: products,
-        });
+
+    //get products with pagination
+
+    app.get("/products", async (req, res) => {
+      const limit = Number(req.query.limit);
+      const pageNumber = Number(req.query.pageNumber);
+
+      console.log(limit, pageNumber);
+
+      const cursor = productCollection.find();
+      const products = await cursor
+        .skip(limit * pageNumber)
+        .limit(limit)
+        .toArray();
+
+      const count = await productCollection.estimatedDocumentCount();
+
+      if (!products?.length) {
+        return res.send({ success: false, error: "No product found" });
+      }
+
+      res.send({ success: true, data: products, count: count });
+    });
+
+    //get with id
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const cursor = productCollection.find(query);
+      const products = await cursor.toArray();
+      // res.send(result);
+      res.send({
+        success: true,
+        data: products,
       });
-     
+    });
+
     // delete
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
