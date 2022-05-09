@@ -46,19 +46,19 @@ const client = new MongoClient(uri, {
     // post data to DB
     app.post("/products", async (req, res) => {
       const product = req.body;
-       if (
-         !product.name ||
-         !product.price ||
-         !product.img ||
-         !product.desc ||
-         !product.quantity ||
-         !product.dealer
-       ) {
-         return res.send({
-           success: false,
-           error: "Please provide all information",
-         });
-       }
+      if (
+        !product.name ||
+        !product.price ||
+        !product.img ||
+        !product.desc ||
+        !product.quantity ||
+        !product.dealer
+      ) {
+        return res.send({
+          success: false,
+          error: "Please provide all information",
+        });
+      }
       await productCollection.insertOne(product);
       // res.json({ product });
       res.send({
@@ -100,14 +100,12 @@ const client = new MongoClient(uri, {
     app.get("/products", async (req, res) => {
       const limit = Number(req.query.limit);
       const pageNumber = Number(req.query.pageNumber);
-      
 
       const cursor = productCollection.find();
       const products = await cursor
         .skip(limit * pageNumber)
         .limit(limit)
         .toArray();
-      
 
       const count = await productCollection.estimatedDocumentCount();
 
@@ -115,7 +113,7 @@ const client = new MongoClient(uri, {
         return res.send({ success: false, error: "No product found" });
       }
 
-      res.send({ success: true, data: products, count:count });
+      res.send({ success: true, data: products, count: count });
     });
 
     //get with id
@@ -130,9 +128,27 @@ const client = new MongoClient(uri, {
         data: products,
       });
     });
-
+    // update product
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          name: updatedProduct.quantity,
+        },
+      };
+      const result = await productCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+    
     // delete
-    app.delete("/products/:id",validateId, async (req, res) => {
+    app.delete("/products/:id", validateId, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productCollection.deleteOne(query);
