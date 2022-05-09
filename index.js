@@ -136,7 +136,7 @@ const client = new MongoClient(uri, {
       const options = { upsert: true };
       const updatedDoc = {
         $set: {
-          name: updatedProduct.quantity,
+          quantity: updatedProduct.quantity,
         },
       };
       const result = await productCollection.updateOne(
@@ -146,7 +146,7 @@ const client = new MongoClient(uri, {
       );
       res.send(result);
     });
-    
+
     // delete
     app.delete("/products/:id", validateId, async (req, res) => {
       const id = req.params.id;
