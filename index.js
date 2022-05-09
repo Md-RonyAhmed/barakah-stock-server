@@ -15,6 +15,20 @@ app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 app.use(express.json());
 
+const validateId = (req, res, next) => {
+  const id = req.params.id;
+  const objectIdRegex = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
+  const validId = objectIdRegex.test(id);
+
+  if (!id || !validId) {
+    return res.send({ success: false, error: "Invalid id" });
+  }
+
+  req.id = id;
+
+  next();
+};
+
 // DB connection
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@barakah.z3u4t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
@@ -32,6 +46,19 @@ const client = new MongoClient(uri, {
     // post data to DB
     app.post("/products", async (req, res) => {
       const product = req.body;
+       if (
+         !product.name ||
+         !product.price ||
+         !product.img ||
+         !product.desc ||
+         !product.quantity ||
+         !product.dealer
+       ) {
+         return res.send({
+           success: false,
+           error: "Please provide all information",
+         });
+       }
       await productCollection.insertOne(product);
       // res.json({ product });
       res.send({
@@ -105,10 +132,14 @@ const client = new MongoClient(uri, {
     });
 
     // delete
-    app.delete("/products/:id", async (req, res) => {
+    app.delete("/products/:id",validateId, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await productCollection.deleteOne(query);
+      if (!result.deletedCount) {
+        return res.send({ success: false, error: "something went wrong" });
+      }
+
       // res.send(result);
       res.send({
         success: true,
