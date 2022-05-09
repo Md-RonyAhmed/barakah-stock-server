@@ -129,14 +129,14 @@ const client = new MongoClient(uri, {
       });
     });
     // update product
-    app.put("/products/:id", async (req, res) => {
+    app.put("/product/:id", async (req, res) => {
       const id = req.params.id;
       const updatedProduct = req.body;
       const filter = { _id: ObjectId(id) };
       const options = { upsert: true };
       const updatedDoc = {
         $set: {
-          quantity: updatedProduct.quantity,
+          ...data,
         },
       };
       const result = await productCollection.updateOne(
