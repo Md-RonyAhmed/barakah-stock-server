@@ -73,7 +73,7 @@ const client = new MongoClient(uri, {
     app.get("/products", async (req, res) => {
       const limit = Number(req.query.limit);
       const pageNumber = Number(req.query.pageNumber);
-      console.log(pageNumber);
+      
 
       const cursor = productCollection.find();
       const products = await cursor
@@ -88,7 +88,7 @@ const client = new MongoClient(uri, {
         return res.send({ success: false, error: "No product found" });
       }
 
-      res.send({ success: true, data: products, count: count });
+      res.send({ success: true, data: products, count:count });
     });
 
     //get with id
