@@ -42,7 +42,7 @@ const client = new MongoClient(uri, {
   try {
     await client.connect();
     const productCollection = client.db("barakah").collection("products");
-    // console.log('DB connected');
+    console.log('DB connected');
     // post data to DB
     app.post("/products", async (req, res) => {
       const product = req.body;
